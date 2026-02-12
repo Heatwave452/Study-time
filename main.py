@@ -1,4 +1,5 @@
 import pygame, sys, random
+import math
 from config import WIDTH, HEIGHT, FPS, COLORS, ARENA
 from player import Player
 from systems import HUD
@@ -10,6 +11,11 @@ from chemistry_enemies import AcidicAlchemist
 from loot import Loot
 from visual_effects import DamageNumber, HitParticle, LevelUpEffect
 from utils import vec2_from_keys
+
+# UI Constants
+BUTTON_HIGHLIGHT_ALPHA = 40
+BUTTON_BORDER_ALPHA = 60
+BUTTON_BORDER_ALPHA_IDLE = 30
 
 class Button:
     def __init__(self, text, pos, size, font, color_idle, color_hover):
@@ -38,11 +44,13 @@ class Button:
         if self.hovered:
             highlight_rect = pygame.Rect(self.rect.x, self.rect.y, self.rect.width, self.rect.height // 3)
             highlight_surface = pygame.Surface((highlight_rect.width, highlight_rect.height), pygame.SRCALPHA)
-            pygame.draw.rect(highlight_surface, (255, 255, 255, 40), highlight_surface.get_rect(), border_radius=10)
+            pygame.draw.rect(highlight_surface, (255, 255, 255, BUTTON_HIGHLIGHT_ALPHA), 
+                           highlight_surface.get_rect(), border_radius=10)
             screen.blit(highlight_surface, highlight_rect.topleft)
         
         # Draw border for extra polish
-        pygame.draw.rect(screen, (255, 255, 255, 60) if self.hovered else (255, 255, 255, 30), 
+        border_alpha = BUTTON_BORDER_ALPHA if self.hovered else BUTTON_BORDER_ALPHA_IDLE
+        pygame.draw.rect(screen, (255, 255, 255, border_alpha), 
                         self.rect, width=2, border_radius=10)
         
         # Draw text with subtle shadow
@@ -365,7 +373,6 @@ def class_selection_screen(screen, clock, font_small, font_button):
         screen.fill(COLORS["bg"])
         
         # Add subtle background pattern
-        import math
         for i in range(10):
             alpha = 20
             y = i * 70
@@ -500,7 +507,6 @@ def main_menu():
         screen.fill(COLORS["bg"])
         
         # Add decorative background elements
-        import math
         for i in range(5):
             alpha = int(30 + 10 * math.sin(pulse_time * 2 + i))
             size = 150 + i * 40
