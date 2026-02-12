@@ -42,14 +42,22 @@ class HUD:
         # Ability cooldowns with labels
         dash_status = "READY ✓" if player._dash_timer == 0 else f"{player._dash_timer:.1f}s"
         parry_status = "READY ✓" if player._parry_timer == 0 else f"{player._parry_timer:.1f}s"
+        area_status = "READY ✓" if player._area_attack_timer == 0 else f"{player._area_attack_timer:.1f}s"
         
         draw_text(surf, f"[Shift] Dash: {dash_status}", (16, 158), self.font, (150, 200, 255))
         draw_text(surf, f"[C] Parry: {parry_status}", (16, 182), self.font, (255, 180, 100))
+        draw_text(surf, f"[R] Area Attack: {area_status}", (16, 206), self.font, (255, 150, 255))
+        
+        # Charged attack indicator
+        if player.charged_attack_time > 0:
+            charge_pct = min(100, int((player.charged_attack_time / 0.8) * 100))
+            charge_color = (255, 215, 0) if charge_pct >= 100 else (200, 200, 100)
+            draw_text(surf, f"Charging: {charge_pct}%", (16, 230), self.font, charge_color)
         
         # NEW: Ultimate charge display
         ultimate_pct = int((player.ultimate_charge / player.ultimate_max_charge) * 100)
         ultimate_color = (255, 100, 100) if ultimate_pct == 100 else (255, 200, 100)
-        draw_text(surf, f"[Q] Ultimate: {ultimate_pct}%", (16, 206), self.font, ultimate_color)
+        draw_text(surf, f"[Q] Ultimate: {ultimate_pct}%", (16, 254), self.font, ultimate_color)
         
         # NEW: Berserk indicator
         if player.berserk_active:
@@ -57,7 +65,7 @@ class HUD:
             draw_text(surf, berserk_text, (WIDTH//2 - 80, 50), self.font, (255, 50, 50))
         
         # Buff indicators
-        y_offset = 230
+        y_offset = 278
         if player.damage_buff > 1.0:
             draw_text(surf, f"DMG BUFF: +{int((player.damage_buff-1)*100)}%", (16, y_offset), self.font, (255, 150, 150))
             y_offset += 24

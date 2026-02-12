@@ -36,17 +36,21 @@ class Room:
             return
 
         if self.room_type == "hall":
-            n = random.randint(2, 3)
+            n = random.randint(2, 4)  # Increased variety
             for i in range(n):
                 self._spawn_class_enemy()
         
         elif self.room_type == "classroom":
-            n = random.randint(3, 4)
+            n = random.randint(4, 6)  # More enemies for harder rooms
             for i in range(n):
                 self._spawn_class_enemy()
         
         elif self.room_type == "boss":
+            # Spawn boss with some minions
             self.enemies.append(self._spawn_boss())
+            # Add 2 minions
+            for _ in range(2):
+                self._spawn_class_enemy()
         
         elif self.room_type == "shop":
             # Rest stop has no enemies - mark as cleared immediately

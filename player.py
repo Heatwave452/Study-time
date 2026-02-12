@@ -76,6 +76,13 @@ class Player:
         self.total_kills = 0
         self.score = 0
         
+        # Special attacks
+        self.charged_attack_time = 0.0
+        self.charged_attack_ready = False
+        self.charged_attack_damage_mult = 3.0
+        self.area_attack_cooldown = 5.0
+        self._area_attack_timer = 0.0
+        
         # Cache fonts for performance
         self.combo_font = pygame.font.SysFont("arial", 16, bold=True)
         self.level_up_timer = 0.0  # For level up animation
@@ -140,6 +147,7 @@ class Player:
         self._ultimate_timer = max(0.0, self._ultimate_timer - dt)
         self.crit_timer = max(0.0, self.crit_timer - dt)
         self.level_up_timer = max(0.0, self.level_up_timer - dt)
+        self._area_attack_timer = max(0.0, self._area_attack_timer - dt)
         
         # NEW: Berserk mode
         if self.berserk_active:
@@ -177,13 +185,29 @@ class Player:
             self.combo_count += 1
             self.max_combo = max(self.max_combo, self.combo_count)
             
+            # Check for charged attack
+            if self.charged_attack_ready:
+                self.charged_attack_ready = False
+                self.charged_attack_time = 0.0
+            
             # NEW: Charge ultimate
             self.ultimate_charge = min(self.ultimate_max_charge, self.ultimate_charge + 10)
+            return True
+        return False
+    
+    def try_area_attack(self):
+        """Area attack - hits all enemies in larger radius"""
+        if self._area_attack_timer <= 0.0:
+            self._area_attack_timer = self.area_attack_cooldown
             return True
         return False
 
     def get_damage(self):
         base_dmg = (self.melee_damage + (self.combo_count - 1) * 2) * self.damage_buff
+        
+        # Apply charged attack multiplier
+        if self.charged_attack_ready:
+            base_dmg *= self.charged_attack_damage_mult
         
         # NEW: Apply berserk multiplier
         if self.berserk_active:

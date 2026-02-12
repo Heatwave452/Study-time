@@ -108,6 +108,14 @@ def game_loop(screen, clock, selected_classes, difficulty_year):
                     running = False
                 if event.key == pygame.K_SPACE:
                     player.try_attack()
+                # NEW: Hold space for charged attack
+                if event.key == pygame.K_r:
+                    # Area attack
+                    if player.try_area_attack():
+                        # Mark for area attack processing
+                        player.attacking = True
+                        player.attack_visual_timer = 0.2
+                        player.attack_range_temp = player.attack_range * 2
                 if event.key == pygame.K_LSHIFT:
                     keys = pygame.key.get_pressed()
                     dir = vec2_from_keys(keys, pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d)
@@ -120,6 +128,13 @@ def game_loop(screen, clock, selected_classes, difficulty_year):
                 # NEW: Ultimate ability
                 if event.key == pygame.K_q:
                     player.try_ultimate()
+            
+            # Track space key hold for charged attack
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                player.charged_attack_time = 0.0
+            elif event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+                if player.charged_attack_time >= 0.8:
+                    player.charged_attack_ready = True
 
         keys = pygame.key.get_pressed()
         current_room = map_manager.current_room
@@ -129,8 +144,25 @@ def game_loop(screen, clock, selected_classes, difficulty_year):
             # Track level before update
             old_level = player.level
             
+            # Track space key hold for charged attack
+            if keys[pygame.K_SPACE] and player._atk_timer > 0:
+                player.charged_attack_time += dt
+                # Visual feedback for charging
+                if player.charged_attack_time >= 0.8:
+                    # Show charging effect
+                    pass
+            
             player.update(dt, keys)
-            handle_player_attack(player, enemies, loot_items, damage_numbers, particles)
+            
+            # Handle area attack with larger range
+            if hasattr(player, 'attack_range_temp'):
+                old_range = player.attack_range
+                player.attack_range = player.attack_range_temp
+                handle_player_attack(player, enemies, loot_items, damage_numbers, particles)
+                player.attack_range = old_range
+                del player.attack_range_temp
+            else:
+                handle_player_attack(player, enemies, loot_items, damage_numbers, particles)
             
             # Check if leveled up
             if player.level > old_level:
@@ -200,9 +232,11 @@ def game_loop(screen, clock, selected_classes, difficulty_year):
         hud.draw(screen, player, enemies, map_manager.room_index + 1, elapsed)
         map_manager.draw_overlay(screen)
 
-        # UPDATED: Added [Q] Ultimate to hint
-        hint = font.render("[WASD] Move [Space] Attack [Shift] Dash [C] Parry [Q] Ultimate [E] Interact", True, (200, 200, 220))
-        screen.blit(hint, (WIDTH - hint.get_width() - 12, HEIGHT - 28))
+        # UPDATED: Added special attacks to hint
+        hint1 = font.render("[WASD] Move [Space] Attack (hold=charge) [R] Area Attack [Shift] Dash", True, (200, 200, 220))
+        hint2 = font.render("[C] Parry [Q] Ultimate [E] Interact", True, (200, 200, 220))
+        screen.blit(hint1, (WIDTH - hint1.get_width() - 12, HEIGHT - 52))
+        screen.blit(hint2, (WIDTH - hint2.get_width() - 12, HEIGHT - 28))
 
         pygame.display.flip()
         
