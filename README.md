@@ -21,23 +21,30 @@ You are a college student cramming for your final exams. Exhausted, you fall asl
 
 ### Player Abilities
 - **Movement**: WASD keys
-- **Attack**: Space bar - Melee attacks with combo system
+- **Basic Attack**: Space bar - Melee attacks with combo system
+- **Charged Attack**: Hold Space for 0.8s - Deal 3x damage on release
+- **Area Attack**: R key - Hit all enemies in double radius (5s cooldown)
 - **Dash**: Shift - Quick dodge with invulnerability frames
 - **Parry**: C - Perfectly timed blocks reflect damage
-- **Ultimate**: Q - Berserk mode with massive damage boost
+- **Ultimate**: Q - Berserk mode with massive damage boost (charged by dealing/taking damage)
 
 ### Combat Systems
 - **Combo Counter**: Chain hits together for bonus damage
 - **Critical Hits**: Random chance for 2x damage
+- **XP & Leveling**: Gain XP from kills, level up for stat bonuses
+- **Loot Drops**: Enemies drop health and damage buffs (30% chance)
 - **Poison Debuff**: Some enemies apply damage-over-time
 - **Enemy Variety**: Melee, ranged, and magic enemy types
+- **Visual Feedback**: Damage numbers, hit particles, level up effects
 
 ### Progression
 - **10 Floors**: Navigate through halls, classrooms, and boss rooms
-- **Floor 5**: Mini-boss checkpoint
+- **XP System**: Level up to increase HP, damage, and attack range
+- **Floor 5**: Mini-boss checkpoint with boss + minions
 - **Floor 6**: Rest stop to heal and upgrade
-- **Floor 10**: Final exam boss battle
+- **Floor 10**: Final exam boss battle with minions
 - **Upgrades**: Increase damage and movement speed at rest stops
+- **Score Tracking**: Compete for high scores based on kills and XP
 
 ## Enemies
 
@@ -67,7 +74,8 @@ You are a college student cramming for your final exams. Exhausted, you fall asl
 ## Controls
 
 - **WASD**: Move
-- **Space**: Attack
+- **Space**: Attack (hold for charged attack)
+- **R**: Area Attack (hits all nearby enemies)
 - **Shift**: Dash
 - **C**: Parry
 - **Q**: Ultimate Ability
@@ -92,11 +100,31 @@ python main.py
 - Player class system (Procrastinator, Early Bird, Befriender, Cheater)
 - Weapon variety and rarity system
 - Enhanced debuff system (stun, slow, confusion, etc.)
-- Loot drops and equipment upgrades
 - Sound effects and music
+- More special abilities and combos
 
-## Recent Improvements (v0.2)
+## Recent Improvements (v0.3)
 
+### New Features
+- **XP and Leveling System**: Gain XP from kills, level up for permanent stat boosts
+- **Loot System**: Enemies drop health and damage buffs with visual effects
+- **Special Attacks**: 
+  - Charged Attack: Hold Space for 3x damage
+  - Area Attack [R]: Hit all enemies in large radius
+- **Visual Effects**: 
+  - Floating damage numbers
+  - Hit particles and impact effects
+  - Level up particle explosions
+- **Enhanced Progression**:
+  - Score tracking system
+  - Kill counter
+  - Improved end screen with detailed stats
+- **Better Combat Variety**:
+  - More enemies per room (2-4 halls, 4-6 classrooms)
+  - Boss fights now include minions
+  - Improved enemy spawn variety
+
+### Bug Fixes (v0.2)
 - Fixed critical memory leak with projectile cleanup
 - Fixed float comparison issues causing timer bugs
 - Cached fonts for better performance
