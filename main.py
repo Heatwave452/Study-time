@@ -144,13 +144,9 @@ def game_loop(screen, clock, selected_classes, difficulty_year):
             # Track level before update
             old_level = player.level
             
-            # Track space key hold for charged attack
-            if keys[pygame.K_SPACE] and player._atk_timer > 0:
+            # Track space key hold for charged attack (only when not on cooldown)
+            if keys[pygame.K_SPACE] and player._atk_timer <= 0.0:
                 player.charged_attack_time += dt
-                # Visual feedback for charging
-                if player.charged_attack_time >= 0.8:
-                    # Show charging effect
-                    pass
             
             player.update(dt, keys)
             

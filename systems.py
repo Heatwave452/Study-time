@@ -18,7 +18,7 @@ class HUD:
         xp_bar_w = 240
         xp_w = int(xp_bar_w * (player.xp / player.xp_to_next_level))
         pygame.draw.rect(surf, COLORS["ui_hp_back"], (16, 65, xp_bar_w, 12), border_radius=4)
-        pygame.draw.rect(surf, (100, 200, 255), (16, 65, xp_w, 12), border_radius=4)
+        pygame.draw.rect(surf, COLORS["ui_xp"], (16, 65, xp_w, 12), border_radius=4)
         draw_text(surf, f"XP: {player.xp}/{player.xp_to_next_level}", (20, 65), self.font, (240, 240, 255))
         
         alive_enemies = len([e for e in enemies if e.alive()])

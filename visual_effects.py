@@ -70,9 +70,8 @@ class HitParticle:
             return
         
         alpha = int(255 * (self.lifetime / 0.5))
-        color_with_alpha = (*self.color[:3], alpha)
         
-        # Draw as circle
+        # Draw as circle with proper alpha
         pygame.draw.circle(surf, self.color, 
                           (int(self.pos.x), int(self.pos.y)), self.size)
 
