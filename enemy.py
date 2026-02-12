@@ -100,13 +100,13 @@ class MathSwordsman:
                 if direction.length_squared() > 0:
                     self.pos += direction.normalize() * self.speed * dt
             # start windup if in range and off cooldown
-            if dist <= self.attack_range and self._atk_timer == 0.0:
+            if dist <= self.attack_range and self._atk_timer <= 0.0:
                 self.state = "windup"
                 self.state_timer = self.attack_windup
 
         elif self.state == "windup":
             # do nothing but show windup
-            if self.state_timer == 0.0:
+            if self.state_timer <= 0.0:
                 # apply damage if still in range
                 if dist <= (self.attack_range + player.radius):
                     dmg = self.base_damage
@@ -119,7 +119,7 @@ class MathSwordsman:
                 self._atk_timer = self.attack_cooldown
 
         elif self.state == "swing":
-            if self.state_timer == 0.0:
+            if self.state_timer <= 0.0:
                 self.state = "idle"
 
         # clamp to arena
@@ -185,7 +185,7 @@ class MathArcher:
         self.flash_timer = max(0.0, self.flash_timer - dt)
         if self.shield_active:
             self.shield_timer = max(0.0, self.shield_timer - dt)
-            if self.shield_timer == 0.0:
+            if self.shield_timer <= 0.0:
                 self.shield_active = False
                 self.shield_cd = self.shield_cooldown_total
         else:
@@ -205,12 +205,12 @@ class MathArcher:
                 self.pos += dir.normalize() * self.speed * dt
 
         # shield if player too close
-        if dist <= self.shield_trigger and not self.shield_active and self.shield_cd == 0.0:
+        if dist <= self.shield_trigger and not self.shield_active and self.shield_cd <= 0.0:
             self.shield_active = True
             self.shield_timer = self.shield_dur
 
         # shoot at player
-        if dist <= self.aggro_range and self._shoot_timer == 0.0:
+        if dist <= self.aggro_range and self._shoot_timer <= 0.0:
             dir = (player.pos - self.pos)
             if dir.length_squared() > 0:
                 v = dir.normalize() * self.proj_speed
@@ -222,6 +222,8 @@ class MathArcher:
         # update projectiles
         for p in self.projectiles:
             p.update(dt)
+        # remove dead projectiles to prevent memory leak
+        self.projectiles = [p for p in self.projectiles if p.alive_flag]
 
         margin = ARENA["margin"]
         self.pos.x = max(margin, min(WIDTH - margin, self.pos.x))
@@ -288,7 +290,7 @@ class ExamBoss(MathSwordsman):
             self._shoot_timer = max(0.0, self._shoot_timer - dt)
             
             dist = self.pos.distance_to(player.pos)
-            if dist <= self.aggro_range * 1.2 and self._shoot_timer == 0.0:
+            if dist <= self.aggro_range * 1.2 and self._shoot_timer <= 0.0:
                 # Fire 3 projectiles in a spread
                 for angle_offset in [-0.4, 0, 0.4]:
                     dir = (player.pos - self.pos).normalize()

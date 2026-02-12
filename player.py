@@ -68,6 +68,9 @@ class Player:
         # Buffs
         self.damage_buff = 1.0
         self.speed_buff = 1.0
+        
+        # Cache fonts for performance
+        self.combo_font = pygame.font.SysFont("arial", 16, bold=True)
 
     def apply_poison(self, duration, dps):
         self.poison_timer = max(self.poison_timer, duration)
@@ -75,7 +78,7 @@ class Player:
         self.poison_defense_reduction = 0.3
 
     def try_dash(self, direction):
-        if self._dash_timer == 0.0 and direction.length_squared() > 0:
+        if self._dash_timer <= 0.0 and direction.length_squared() > 0:
             self._dash_timer = self.dash_cooldown
             self.is_dashing = True
             self._dash_duration_timer = self.dash_duration
@@ -84,7 +87,7 @@ class Player:
         return False
 
     def try_parry(self):
-        if self._parry_timer == 0.0:
+        if self._parry_timer <= 0.0:
             self._parry_timer = self.parry_cooldown
             self.parrying = True
             self._parry_duration_timer = self.parry_duration
@@ -157,7 +160,7 @@ class Player:
             self.attacking = False
 
     def try_attack(self):
-        if self._atk_timer == 0.0:
+        if self._atk_timer <= 0.0:
             self._atk_timer = self.attack_cooldown
             self.attacking = True
             self.attack_visual_timer = 0.12
@@ -231,7 +234,7 @@ class Player:
         # Draw combo counter
         if self.combo_count > 1:
             combo_color = (255, 255, 100) if self.crit_timer == 0 else (255, 100, 100)
-            combo_text = pygame.font.SysFont("arial", 16, bold=True).render(f"x{self.combo_count}", True, combo_color)
+            combo_text = self.combo_font.render(f"x{self.combo_count}", True, combo_color)
             surf.blit(combo_text, (self.pos.x + 18, self.pos.y - 22))
         
         # Draw dash cooldown

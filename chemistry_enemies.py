@@ -70,12 +70,12 @@ class AcidicAlchemist:
                 if direction.length_squared() > 0:
                     self.pos += direction.normalize() * self.speed * dt
             
-            if dist <= self.attack_range and self._atk_timer == 0.0:
+            if dist <= self.attack_range and self._atk_timer <= 0.0:
                 self.state = "windup"
                 self.state_timer = self.attack_windup
         
         elif self.state == "windup":
-            if self.state_timer == 0.0:
+            if self.state_timer <= 0.0:
                 if dist <= (self.attack_range + player.radius):
                     player.take_damage(self.base_damage)
                     if hasattr(player, 'apply_poison'):
@@ -85,7 +85,7 @@ class AcidicAlchemist:
                 self._atk_timer = self.attack_cooldown
         
         elif self.state == "swing":
-            if self.state_timer == 0.0:
+            if self.state_timer <= 0.0:
                 self.state = "idle"
         
         margin = ARENA["margin"]

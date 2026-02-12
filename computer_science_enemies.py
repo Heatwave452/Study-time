@@ -78,12 +78,12 @@ class BinaryBlade:
                 if direction.length_squared() > 0:
                     self.pos += direction.normalize() * self.speed * dt
             
-            if dist <= self.attack_range and self._atk_timer == 0.0:
+            if dist <= self.attack_range and self._atk_timer <= 0.0:
                 self.state = "windup"
                 self.state_timer = self.attack_windup
         
         elif self.state == "windup":
-            if self.state_timer == 0.0:
+            if self.state_timer <= 0.0:
                 if dist <= (self.attack_range + player.radius):
                     dmg = self.base_damage + self.consecutive_hits
                     player.take_damage(dmg)
@@ -95,7 +95,7 @@ class BinaryBlade:
                 self._atk_timer = self.attack_cooldown
         
         elif self.state == "swing":
-            if self.state_timer == 0.0:
+            if self.state_timer <= 0.0:
                 self.state = "idle"
         
         margin = ARENA["margin"]
@@ -151,7 +151,7 @@ class BugSwarm:
             if dir.length_squared() > 0:
                 self.pos += dir.normalize() * self.speed * dt
         
-        if dist <= self.aggro_range and self._shoot_timer == 0.0:
+        if dist <= self.aggro_range and self._shoot_timer <= 0.0:
             dir = (player.pos - self.pos)
             if dir.length_squared() > 0:
                 v = dir.normalize() * self.proj_speed
@@ -168,6 +168,8 @@ class BugSwarm:
         
         for p in self.projectiles:
             p.update(dt)
+        # remove dead projectiles to prevent memory leak
+        self.projectiles = [p for p in self.projectiles if p.alive_flag]
         
         margin = ARENA["margin"]
         self.pos.x = max(margin, min(WIDTH - margin, self.pos.x))
