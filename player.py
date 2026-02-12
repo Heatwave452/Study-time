@@ -270,29 +270,53 @@ class Player:
         self.total_kills += 1
 
     def draw(self, surf):
-        # NEW: Berserk glow
+        # NEW: Berserk glow with pulsing effect
         if self.berserk_active:
-            pygame.draw.circle(surf, (255, 50, 50), (int(self.pos.x), int(self.pos.y)), self.radius + 10, 3)
+            for radius in [self.radius + 15, self.radius + 12, self.radius + 9]:
+                alpha = 100 if radius == self.radius + 9 else 50
+                glow_surf = pygame.Surface((radius * 2 + 10, radius * 2 + 10), pygame.SRCALPHA)
+                pygame.draw.circle(glow_surf, (255, 50, 50, alpha), (radius + 5, radius + 5), radius)
+                surf.blit(glow_surf, (int(self.pos.x) - radius - 5, int(self.pos.y) - radius - 5))
         
-        # Draw player
+        # Draw player with glow
         if self.is_dashing:
+            # Dash glow
+            glow_surf = pygame.Surface((self.radius * 3, self.radius * 3), pygame.SRCALPHA)
+            pygame.draw.circle(glow_surf, (100, 255, 200, 80), (self.radius * 1.5, self.radius * 1.5), self.radius + 5)
+            surf.blit(glow_surf, (int(self.pos.x) - self.radius * 1.5, int(self.pos.y) - self.radius * 1.5))
             pygame.draw.circle(surf, (100, 255, 200), (int(self.pos.x), int(self.pos.y)), self.radius)
         elif self.parrying:
             pygame.draw.circle(surf, (255, 200, 100), (int(self.pos.x), int(self.pos.y)), self.radius)
         else:
+            # Normal glow
+            glow_surf = pygame.Surface((self.radius * 3, self.radius * 3), pygame.SRCALPHA)
+            pygame.draw.circle(glow_surf, (*COLORS["player_glow"], 60), (self.radius * 1.5, self.radius * 1.5), self.radius + 3)
+            surf.blit(glow_surf, (int(self.pos.x) - self.radius * 1.5, int(self.pos.y) - self.radius * 1.5))
             pygame.draw.circle(surf, COLORS["player"], (int(self.pos.x), int(self.pos.y)), self.radius)
         
-        # Draw attack range
-        if self.attacking:
-            pygame.draw.circle(surf, COLORS["attack"], (int(self.pos.x), int(self.pos.y)), int(self.attack_range), 1)
+        # Draw outer ring for depth
+        pygame.draw.circle(surf, (255, 255, 255), (int(self.pos.x), int(self.pos.y)), self.radius, 2)
         
-        # Draw parry shield
+        # Draw attack range with better effect
+        if self.attacking:
+            attack_surf = pygame.Surface((int(self.attack_range) * 2 + 10, int(self.attack_range) * 2 + 10), pygame.SRCALPHA)
+            pygame.draw.circle(attack_surf, (*COLORS["attack"], 100), 
+                             (int(self.attack_range) + 5, int(self.attack_range) + 5), 
+                             int(self.attack_range))
+            surf.blit(attack_surf, (int(self.pos.x) - int(self.attack_range) - 5, 
+                                   int(self.pos.y) - int(self.attack_range) - 5))
+            pygame.draw.circle(surf, COLORS["attack"], (int(self.pos.x), int(self.pos.y)), int(self.attack_range), 2)
+        
+        # Draw parry shield with glow
         if self.parrying:
+            shield_surf = pygame.Surface((self.radius * 3, self.radius * 3), pygame.SRCALPHA)
+            pygame.draw.circle(shield_surf, (255, 200, 100, 80), (self.radius * 1.5, self.radius * 1.5), self.radius + 10)
+            surf.blit(shield_surf, (int(self.pos.x) - self.radius * 1.5, int(self.pos.y) - self.radius * 1.5))
             pygame.draw.circle(surf, (255, 200, 100), (int(self.pos.x), int(self.pos.y)), self.radius + 8, 3)
         
         # Draw poison indicator
         if self.poison_timer > 0:
-            pygame.draw.circle(surf, (100, 255, 100), (int(self.pos.x), int(self.pos.y)), self.radius + 4, 2)
+            pygame.draw.circle(surf, COLORS["poison"], (int(self.pos.x), int(self.pos.y)), self.radius + 4, 2)
         
         # Draw combo counter
         if self.combo_count > 1:

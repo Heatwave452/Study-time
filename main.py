@@ -24,9 +24,35 @@ class Button:
 
     def draw(self, screen):
         color = self.color_hover if self.hovered else self.color_idle
-        pygame.draw.rect(screen, color, self.rect, border_radius=8)
+        
+        # Draw shadow for depth
+        shadow_rect = self.rect.copy()
+        shadow_rect.x += 3
+        shadow_rect.y += 3
+        pygame.draw.rect(screen, COLORS["button_shadow"], shadow_rect, border_radius=10)
+        
+        # Draw main button with gradient effect (simulated with layered rectangles)
+        pygame.draw.rect(screen, color, self.rect, border_radius=10)
+        
+        # Draw highlight on top for 3D effect
+        if self.hovered:
+            highlight_rect = pygame.Rect(self.rect.x, self.rect.y, self.rect.width, self.rect.height // 3)
+            highlight_surface = pygame.Surface((highlight_rect.width, highlight_rect.height), pygame.SRCALPHA)
+            pygame.draw.rect(highlight_surface, (255, 255, 255, 40), highlight_surface.get_rect(), border_radius=10)
+            screen.blit(highlight_surface, highlight_rect.topleft)
+        
+        # Draw border for extra polish
+        pygame.draw.rect(screen, (255, 255, 255, 60) if self.hovered else (255, 255, 255, 30), 
+                        self.rect, width=2, border_radius=10)
+        
+        # Draw text with subtle shadow
+        text_shadow = self.font.render(self.text, True, (0, 0, 0))
         text_surf = self.font.render(self.text, True, (255, 255, 255))
         text_rect = text_surf.get_rect(center=self.rect.center)
+        shadow_rect = text_rect.copy()
+        shadow_rect.x += 2
+        shadow_rect.y += 2
+        screen.blit(text_shadow, shadow_rect)
         screen.blit(text_surf, text_rect)
 
     def is_hovered(self, mouse_pos):
@@ -327,56 +353,104 @@ def class_selection_screen(screen, clock, font_small, font_button):
                 
                 for i, year in enumerate(years):
                     x = 150 + i * 120
-                    y = 380
+                    y = 340
                     rect = pygame.Rect(x, y, 100, 50)
                     if rect.collidepoint(mouse_pos):
                         selected_year = year
                 
-                start_rect = pygame.Rect(WIDTH//2 - 120, HEIGHT - 80, 240, 60)
+                start_rect = pygame.Rect(WIDTH//2 - 120, HEIGHT - 100, 240, 70)
                 if start_rect.collidepoint(mouse_pos) and len(selected_classes) >= 2:
                     selecting = False
         
         screen.fill(COLORS["bg"])
         
-        title = font_button.render("Select Classes & Difficulty", True, (255, 200, 100))
-        screen.blit(title, (WIDTH//2 - title.get_width()//2, 20))
+        # Add subtle background pattern
+        import math
+        for i in range(10):
+            alpha = 20
+            y = i * 70
+            surface = pygame.Surface((WIDTH, 70), pygame.SRCALPHA)
+            pygame.draw.rect(surface, (*COLORS["bg_accent"], alpha), surface.get_rect())
+            screen.blit(surface, (0, y))
         
-        class_label = font_small.render("Available Classes:", True, (200, 200, 200))
+        title = font_button.render("Select Classes & Difficulty", True, COLORS["ui_gold"])
+        screen.blit(title, (WIDTH//2 - title.get_width()//2, 30))
+        
+        class_label = font_small.render("Available Classes:", True, (220, 220, 240))
         screen.blit(class_label, (50, 90))
         
         for i, cls in enumerate(all_classes):
             x = 50 + (i % 3) * 310
             y = 120 + (i // 3) * 85
             is_selected = cls in selected_classes
-            color = (100, 170, 230) if is_selected else (70, 130, 180)
+            color = COLORS["menu_hover"] if is_selected else COLORS["menu_accent"]
             rect = pygame.Rect(x, y, 280, 65)
-            pygame.draw.rect(screen, color, rect, border_radius=6)
+            
+            # Draw shadow
+            shadow_rect = rect.copy()
+            shadow_rect.x += 2
+            shadow_rect.y += 2
+            pygame.draw.rect(screen, COLORS["button_shadow"], shadow_rect, border_radius=8)
+            
+            # Draw main button
+            pygame.draw.rect(screen, color, rect, border_radius=8)
+            
+            # Draw border
+            border_color = (255, 215, 0) if is_selected else (100, 150, 200)
+            border_width = 3 if is_selected else 2
+            pygame.draw.rect(screen, border_color, rect, width=border_width, border_radius=8)
+            
             text = font_small.render(cls, True, (255, 255, 255))
             screen.blit(text, (rect.centerx - text.get_width()/2, rect.centery - text.get_height()/2))
         
-        difficulty_label = font_small.render("Difficulty:", True, (200, 200, 200))
-        screen.blit(difficulty_label, (50, 350))
+        difficulty_label = font_small.render("Difficulty:", True, (220, 220, 240))
+        screen.blit(difficulty_label, (50, 310))
         
         for i, year in enumerate(years):
             x = 150 + i * 120
-            y = 380
+            y = 340
             is_selected = year == selected_year
-            color = (100, 170, 230) if is_selected else (70, 130, 180)
+            color = COLORS["menu_hover"] if is_selected else COLORS["menu_accent"]
             rect = pygame.Rect(x, y, 100, 50)
-            pygame.draw.rect(screen, color, rect, border_radius=4)
+            
+            # Draw shadow
+            shadow_rect = rect.copy()
+            shadow_rect.x += 2
+            shadow_rect.y += 2
+            pygame.draw.rect(screen, COLORS["button_shadow"], shadow_rect, border_radius=6)
+            
+            pygame.draw.rect(screen, color, rect, border_radius=6)
+            
+            # Draw border
+            border_color = (255, 215, 0) if is_selected else (100, 150, 200)
+            border_width = 3 if is_selected else 2
+            pygame.draw.rect(screen, border_color, rect, width=border_width, border_radius=6)
+            
             text = font_small.render(year[:6], True, (255, 255, 255))
             screen.blit(text, (rect.centerx - text.get_width()/2, rect.centery - text.get_height()/2))
         
-        start_rect = pygame.Rect(WIDTH//2 - 120, HEIGHT - 80, 240, 60)
+        start_rect = pygame.Rect(WIDTH//2 - 120, HEIGHT - 100, 240, 70)
         can_start = len(selected_classes) >= 2
         color = (100, 200, 100) if can_start else (100, 100, 100)
-        pygame.draw.rect(screen, color, start_rect, border_radius=6)
-        text = font_button.render("START" if can_start else "Need 2+ Classes", True, (255, 255, 255))
+        
+        # Draw shadow
+        shadow_rect = start_rect.copy()
+        shadow_rect.x += 3
+        shadow_rect.y += 3
+        pygame.draw.rect(screen, COLORS["button_shadow"], shadow_rect, border_radius=12)
+        
+        pygame.draw.rect(screen, color, start_rect, border_radius=12)
+        
+        # Add highlight if can start
+        if can_start:
+            pygame.draw.rect(screen, (255, 255, 255, 60), start_rect, width=3, border_radius=12)
+        
+        text = font_button.render("START GAME" if can_start else "Select 2+ Classes", True, (255, 255, 255))
         screen.blit(text, (start_rect.centerx - text.get_width()/2, start_rect.centery - text.get_height()/2))
         
         info = font_small.render(f"Selected: {', '.join(selected_classes) if selected_classes else 'None'}", 
-                               True, (200, 200, 200))
-        screen.blit(info, (WIDTH//2 - info.get_width()//2, HEIGHT - 150))
+                               True, COLORS["ui_gold"])
+        screen.blit(info, (WIDTH//2 - info.get_width()//2, HEIGHT - 160))
         
         pygame.display.flip()
     
@@ -387,18 +461,21 @@ def main_menu():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Study Time — College Dream RPG")
     clock = pygame.time.Clock()
-    font_big = pygame.font.SysFont("arial", 54, bold=True)
+    font_big = pygame.font.SysFont("arial", 64, bold=True)
     font_small = pygame.font.SysFont("arial", 28)
-    font_tiny = pygame.font.SysFont("arial", 16)
+    font_tiny = pygame.font.SysFont("arial", 18)
 
     play_btn = Button("PLAY", (WIDTH // 2 - 100, HEIGHT // 2 - 40), (200, 60),
-                      font_small, (70, 130, 180), (100, 170, 230))
+                      font_small, COLORS["menu_accent"], COLORS["menu_hover"])
     quit_btn = Button("QUIT", (WIDTH // 2 - 100, HEIGHT // 2 + 40), (200, 60),
                       font_small, (180, 70, 70), (230, 100, 100))
 
     running = True
+    pulse_time = 0.0
+    
     while running:
         dt = clock.tick(FPS) / 1000.0
+        pulse_time += dt
         event_list = pygame.event.get()
         mouse_pos = pygame.mouse.get_pos()
 
@@ -419,11 +496,37 @@ def main_menu():
         if quit_btn.is_clicked(mouse_pos, event_list):
             running = False
 
-        screen.fill((25, 25, 35))
+        # Draw background with gradient effect
+        screen.fill(COLORS["bg"])
+        
+        # Add decorative background elements
+        import math
+        for i in range(5):
+            alpha = int(30 + 10 * math.sin(pulse_time * 2 + i))
+            size = 150 + i * 40
+            x = WIDTH // 2 + int(100 * math.cos(pulse_time * 0.5 + i * 1.2))
+            y = HEIGHT // 3 + int(50 * math.sin(pulse_time * 0.5 + i * 1.2))
+            surface = pygame.Surface((size, size), pygame.SRCALPHA)
+            pygame.draw.circle(surface, (*COLORS["menu_accent"], alpha), (size//2, size//2), size//2)
+            screen.blit(surface, (x - size//2, y - size//2))
+        
+        # Draw title with glow effect
+        glow_offset = int(5 + 3 * math.sin(pulse_time * 3))
+        
+        # Title glow
+        for offset in [8, 6, 4, 2]:
+            glow_title = font_big.render("Study Time", True, (*COLORS["menu_hover"], 50))
+            screen.blit(glow_title, (WIDTH // 2 - glow_title.get_width() // 2 + offset, 
+                                    HEIGHT // 3 - 80 + offset))
+        
+        # Main title
         title = font_big.render("Study Time", True, (255, 255, 255))
-        subtitle = font_tiny.render("A College Student's Final Exam Dream", True, (200, 200, 200))
         screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 3 - 80))
+        
+        # Subtitle with better styling
+        subtitle = font_tiny.render("A College Student's Final Exam Dream", True, COLORS["ui_gold"])
         screen.blit(subtitle, (WIDTH // 2 - subtitle.get_width() // 2, HEIGHT // 3 - 20))
+        
         play_btn.draw(screen)
         quit_btn.draw(screen)
 
