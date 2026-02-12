@@ -7,6 +7,8 @@ from enemy import MathSwordsman, MathArcher
 from computer_science_enemies import BinaryBlade, BugSwarm
 from physics_enemies import KineticBrute, GravityManipulator
 from chemistry_enemies import AcidicAlchemist
+from loot import Loot
+from visual_effects import DamageNumber, HitParticle, LevelUpEffect
 from utils import vec2_from_keys
 
 class Button:
@@ -35,17 +37,42 @@ class Button:
             e.type == pygame.MOUSEBUTTONDOWN and e.button == 1 for e in event_list
         )
 
-def handle_player_attack(player, enemies):
+def handle_player_attack(player, enemies, loot_items, damage_numbers, particles):
     hits = 0
     if not player.attacking:
         return hits
     for e in enemies:
         if not e.alive():
             continue
+        was_alive = e.hp > 0
         if player.pos.distance_to(e.pos) <= (player.attack_range + e.radius):
             dmg = player.get_damage()
             e.take_damage(dmg)
             hits += 1
+            
+            # Show damage number
+            is_crit = player.crit_timer > 0
+            damage_numbers.append(DamageNumber(e.pos.copy(), dmg, is_crit))
+            
+            # Create hit particles
+            for _ in range(5):
+                particles.append(HitParticle(e.pos.copy()))
+            
+            # Check if enemy just died
+            if was_alive and not e.alive():
+                # Grant XP based on enemy HP
+                xp_reward = int(e.max_hp * 2)
+                player.gain_xp(xp_reward)
+                player.add_kill()
+                
+                # Create more particles on death
+                for _ in range(10):
+                    particles.append(HitParticle(e.pos.copy(), (200, 100, 100)))
+                
+                # Drop loot (30% chance)
+                if random.random() < 0.3:
+                    loot_type = random.choice(["health", "damage"])
+                    loot_items.append(Loot(e.pos.copy(), loot_type))
     return hits
 
 def update_enemy_projectiles(enemies, player):
@@ -62,6 +89,10 @@ def game_loop(screen, clock, selected_classes, difficulty_year):
     map_manager = MapManager(selected_classes, difficulty_year)
     map_manager.load_map()
     elapsed = 0.0
+    loot_items = []  # Track loot drops
+    damage_numbers = []  # Track damage numbers
+    particles = []  # Track visual particles
+    level_up_effects = []  # Track level up effects
     running = True
 
     while running:
@@ -95,14 +126,41 @@ def game_loop(screen, clock, selected_classes, difficulty_year):
         enemies = current_room.enemies
 
         if player.alive():
+            # Track level before update
+            old_level = player.level
+            
             player.update(dt, keys)
-            handle_player_attack(player, enemies)
+            handle_player_attack(player, enemies, loot_items, damage_numbers, particles)
+            
+            # Check if leveled up
+            if player.level > old_level:
+                level_up_effects.append(LevelUpEffect(player.pos.copy()))
 
             for e in enemies:
                 if e.alive():
                     e.update(dt, player)
 
             update_enemy_projectiles(enemies, player)
+            
+            # Update loot items
+            for loot in loot_items:
+                if loot.alive_flag:
+                    loot.update(dt, player)
+            # Remove collected/expired loot
+            loot_items = [l for l in loot_items if l.alive_flag]
+            
+            # Update visual effects
+            for dn in damage_numbers:
+                dn.update(dt)
+            damage_numbers = [dn for dn in damage_numbers if dn.alive]
+            
+            for p in particles:
+                p.update(dt)
+            particles = [p for p in particles if p.alive]
+            
+            for effect in level_up_effects:
+                effect.update(dt)
+            level_up_effects = [e for e in level_up_effects if e.alive]
 
             pressed_e = any(e.type == pygame.KEYDOWN and e.key == pygame.K_e for e in event_list)
             map_manager.update_logic(player, dt, pressed_e)
@@ -115,6 +173,11 @@ def game_loop(screen, clock, selected_classes, difficulty_year):
         for e in enemies:
             if e.alive():
                 e.draw(screen)
+        
+        # Draw loot items
+        for loot in loot_items:
+            if loot.alive_flag:
+                loot.draw(screen)
 
         if player.alive():
             player.draw(screen)
@@ -123,6 +186,16 @@ def game_loop(screen, clock, selected_classes, difficulty_year):
                 "You fell asleep... again.", True, (255, 180, 180)
             )
             screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - 24))
+        
+        # Draw visual effects
+        for p in particles:
+            p.draw(screen)
+        
+        for dn in damage_numbers:
+            dn.draw(screen)
+        
+        for effect in level_up_effects:
+            effect.draw(screen)
 
         hud.draw(screen, player, enemies, map_manager.room_index + 1, elapsed)
         map_manager.draw_overlay(screen)
@@ -134,15 +207,15 @@ def game_loop(screen, clock, selected_classes, difficulty_year):
         pygame.display.flip()
         
         if not player.alive() or (map_manager.room_index >= len(map_manager.rooms) - 1 and current_room.cleared):
-            show_end_screen(screen, clock, player.alive() and current_room.cleared, elapsed, player.max_combo)
+            show_end_screen(screen, clock, player.alive() and current_room.cleared, elapsed, player)
             return True
     
     return True
 
-def show_end_screen(screen, clock, won, elapsed_time, max_combo):
+def show_end_screen(screen, clock, won, elapsed_time, player):
     font_title = pygame.font.SysFont("arial", 48, bold=True)
     font_sub = pygame.font.SysFont("arial", 24)
-    font_stats = pygame.font.SysFont("arial", 20)
+    font_stats = pygame.font.SysFont("arial", 18)
     
     waiting = True
     while waiting:
@@ -159,19 +232,38 @@ def show_end_screen(screen, clock, won, elapsed_time, max_combo):
         if won:
             title = font_title.render("YOU WOKE UP!", True, (100, 255, 100))
             subtitle = font_sub.render(f"Victory!", True, (200, 255, 200))
-            stats = font_stats.render(f"Time: {int(elapsed_time)}s  |  Max Combo: {max_combo}", True, (200, 255, 200))
         else:
             title = font_title.render("GAME OVER", True, (255, 100, 100))
             subtitle = font_sub.render("You fell asleep...", True, (255, 200, 200))
-            stats = font_stats.render(f"Time survived: {int(elapsed_time)}s  |  Max Combo: {max_combo}", True, (255, 200, 200))
         
-        title_rect = title.get_rect(center=(WIDTH//2, HEIGHT//2 - 80))
-        subtitle_rect = subtitle.get_rect(center=(WIDTH//2, HEIGHT//2 - 20))
-        stats_rect = stats.get_rect(center=(WIDTH//2, HEIGHT//2 + 40))
+        # Display detailed stats
+        stats_lines = [
+            f"Final Level: {player.level}",
+            f"Total Score: {player.score}",
+            f"Kills: {player.total_kills}",
+            f"Max Combo: {player.max_combo}",
+            f"Time: {int(elapsed_time)}s",
+        ]
+        
+        title_rect = title.get_rect(center=(WIDTH//2, HEIGHT//2 - 120))
+        subtitle_rect = subtitle.get_rect(center=(WIDTH//2, HEIGHT//2 - 60))
         
         screen.blit(title, title_rect)
         screen.blit(subtitle, subtitle_rect)
-        screen.blit(stats, stats_rect)
+        
+        # Draw stats
+        y_offset = HEIGHT//2 - 10
+        for stat_line in stats_lines:
+            color = (200, 255, 200) if won else (255, 200, 200)
+            stat_surf = font_stats.render(stat_line, True, color)
+            stat_rect = stat_surf.get_rect(center=(WIDTH//2, y_offset))
+            screen.blit(stat_surf, stat_rect)
+            y_offset += 30
+        
+        # Continue prompt
+        continue_text = font_stats.render("Press any key to continue...", True, (150, 150, 150))
+        continue_rect = continue_text.get_rect(center=(WIDTH//2, HEIGHT - 50))
+        screen.blit(continue_text, continue_rect)
         
         pygame.display.flip()
 

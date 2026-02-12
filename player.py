@@ -69,8 +69,16 @@ class Player:
         self.damage_buff = 1.0
         self.speed_buff = 1.0
         
+        # XP and Leveling System
+        self.level = 1
+        self.xp = 0
+        self.xp_to_next_level = 100
+        self.total_kills = 0
+        self.score = 0
+        
         # Cache fonts for performance
         self.combo_font = pygame.font.SysFont("arial", 16, bold=True)
+        self.level_up_timer = 0.0  # For level up animation
 
     def apply_poison(self, duration, dps):
         self.poison_timer = max(self.poison_timer, duration)
@@ -131,6 +139,7 @@ class Player:
         self._parry_timer = max(0.0, self._parry_timer - dt)
         self._ultimate_timer = max(0.0, self._ultimate_timer - dt)
         self.crit_timer = max(0.0, self.crit_timer - dt)
+        self.level_up_timer = max(0.0, self.level_up_timer - dt)
         
         # NEW: Berserk mode
         if self.berserk_active:
@@ -205,6 +214,36 @@ class Player:
 
     def alive(self):
         return self.hp > 0
+    
+    def gain_xp(self, amount):
+        """Gain XP and check for level up"""
+        self.xp += amount
+        self.score += amount
+        
+        if self.xp >= self.xp_to_next_level:
+            self.level_up()
+    
+    def level_up(self):
+        """Level up and gain stat bonuses"""
+        self.level += 1
+        self.xp -= self.xp_to_next_level
+        self.xp_to_next_level = int(self.xp_to_next_level * 1.5)
+        
+        # Stat increases
+        self.max_hp += 10
+        self.hp = min(self.max_hp, self.hp + 20)  # Heal 20 HP on level up
+        self.melee_damage += 2
+        self.attack_range += 2
+        
+        # Visual feedback
+        self.level_up_timer = 2.0
+        
+        # Charge ultimate on level up
+        self.ultimate_charge = min(self.ultimate_max_charge, self.ultimate_charge + 25)
+    
+    def add_kill(self):
+        """Track kills for stats"""
+        self.total_kills += 1
 
     def draw(self, surf):
         # NEW: Berserk glow
