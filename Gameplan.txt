@@ -1,0 +1,185 @@
+Study Time
+Action RPG(I'm listing what I know or can suggest)
+Can be a roguelike for an infinite game loop(need to think about the game loop before starting code)
+Player Vs Environment
+POV: 2d, top down
+Storyline
+You are a college student, and while studying for your finals, you fall asleep, and in your dream, you are fighting principles of each of the hardest classes you are taking.
+Gameplay: You can plug in up to five courses(minimum 2) to fight and adjust the difficulty by choosing the year.
+Years: Freshman, Sophomore, Junior, Senior, Graduate
+Classes: Math, Computer Science, Physics, Chemistry, Biology, History, Astronomy, Business, Geology, Music, Health, Psychology, Engineering, Art, Communication.
+Enemies: Each class will have a set of enemies unique to what is taught in that class
+Math:
+Melee/Close Range: Human swordsman holding a linear line, and a number will be on top of his head corresponding to the length, the length will increase by one every 20 seconds when attacking and when it reaches 5 it will reset to one and double the attack of the swordsman
+Ranged/Long Range: Human archer holding a right triangle as a bow and will have one skill:
+Skill: If the player gets too close it will summon a small circle around him and blocking all damage for 2 seconds and will go on cooldown for 10 seconds
+Magic/All range: Human mage holding a Statistics textbook and using statistics concepts to attack, will use different attacks when the player if closer or farther then that Mage:
+Close Range attack: Summons a scatter graph that acts as mines and explodes when a player gets too close, will also stun players for 0.25 seconds
+Long range attack: Summons a distribution graph that moves like a wave until it hits a player or if it has been five seconds since it was fired. It it hits a player, they get pushed back and stunned for 0.5 seconds
+Mid range attack: Summons a column graph and summons column from the ground and if a player is hit by the columns that player is pushed back and stunned for 0.5 seconds.
+Computer Science:
+Melee/Close Range: Human hacker that has a “Binary blade” that deals one more damage every consecutive hit and will resent after missing a hit.
+Skill: Every minute will teleport behind the player and deal two times the damage for one attack
+Ranged/Long Range: A “Bug Swarm” that shoots small “Error Code” projectiles.
+Skills: Summons multiple slow homing projectiles that will obscure the players vision for 2 seconds
+Magic/All Range: “Compiler”, a human wizard that cast programming based spells
+Close Range attack: “Firewall”, summons a firewall that will block attacks and push back the player if it touches them.
+Long Range attack:”Infinite Loop”, summons a block of code showing an infinite loop, it will shoot small fast projectiles that slightly pushes that player back
+Mid Range attack: Summons a Runtime error area on the floor that will damage and slows the player overtime
+
+Physics:
+    Melee/Close Range: A “Kinetic Brute” that will attack and move very slowly but will absorb most of the damage while it is moving.
+    Skill: “Singularity Pull”, will pull the player in and attack them with all the damage it absorbed
+    Ranged/Long Range: “Gravity Manipulator”, fires orbs that will circle the player before collapsing and blowing up.
+    Skill: “EMP”, will reflect oncoming projectiles and disable one player skill
+    Magic/All Range: A “Physics Professor” that can manipulate physics concepts
+        Close Range attack: “Heatwave Nova” Releases fire in a 360° circle around and will reduce the players defence
+        Long Range attack: “Light beam” Launches a beam of light that can bounce off walls.
+        Mid Range attack: “Mass disc” Launches a disc that will increase the mass of the player, the player will be slowed significantly and won't be moved by enemy attacks.
+
+Chemistry:
+    Melee/Close Range: “Acidic Alchemist”, a human alchemist that will attack the player with beakers. Every attack will give the player “Chemical Poison” which will damage over time and reduce defence for the duration of the debuff
+    Ranged/Long Range: “Molecular Marksman” will shoot one CH4(will move faster) and two O2(Which will move slower) to create a combustion reaction that will deal massive damage to the player
+    Magic/All Range: “Periodic table Menice”, a mage that uses elements to attack
+        Close Range attack: Summons a graphite wall that will break down after three hits
+        Long Range attack: Creates 3 titanium spheres and launch them at the player
+        Mid Range attack: Summons a mercury floor that damages the player and slows them down
+
+Biology:
+    Melee/Close Range: Small, fast thing that applies a poison debuff causing damage over time and reducing armor
+    Ranged/Long Range: “Bio engineer” shoots projectiles that can heal enemies or inflict a poison debuff to the player causing damage over time and reducing armor.
+    Magic/All Range: Genetic Manipulator - Summons "Clones"
+        Close Range attack: Summons a swarm of clones that attack the player.
+        Long Range attack: Fires a projectile that empowers a nearby enemy, increasing their damage and defense.
+        Mid Range attack: Creates a field that reduces player healing and applies a damage over time debuff.
+
+History:
+    Melee/Close Range: Ancient Warrior - A heavily armored enemy with a slow but powerful sword attack, capable of a "Shield Bash" that stuns players.
+    Ranged/Long Range: Artillery Commander - Stays at a distance, calling down "Cannon Fire" on player locations, and can summon "Foot Soldiers" to engage up close.
+    Magic/All Range: Temporal Anomaly - Distorts time, slowing down players within its aura, and can summon "Echoes of the Past" (ghostly figures) to attack.
+        Close Range attack: Creates a localized time distortion that slows down players and damages them over time.
+        Long Range attack: Summons ghostly figures of soldiers that charge at the player.
+        Mid Range attack: Fires a projectile that briefly stuns the player and reduces their attack speed.
+
+Astronomy:
+    Melee/Close Range: Cosmic Dust Cloud - A swirling mass that deals continuous damage to players within it and can temporarily blind them.
+    Ranged/Long Range: Stellar Sniper - Fires precise "Laser Beams" from a distance, and can create "Gravitational Pull" zones that draw players in.
+    Magic/All Range: Celestial Weaver - Summons "Miniature Black Holes" that pull players in and deal damage, or "Nebula Walls" that block projectiles and slow movement.
+        Close Range attack: Creates a small black hole that pulls in and damages nearby players.
+        Long Range attack: Launches a slow-moving nebula orb that blocks projectiles and slows enemies it passes through.
+        Mid Range attack: Summons a constellation of stars that shoot small, homing projectiles.
+
+Business:
+    Melee/Close Range: Aggressive Investor - Charges at players with a "Briefcase Slam," dealing high damage and potentially "Stunning" them with a "Hostile Takeover" debuff.
+    Ranged/Long Range: Market Analyst - Throws "Stock Reports" that can inflict "Debt" (damage over time) or "Recession" (reduced attack speed) debuffs.
+    Magic/All Range: Corporate Overlord - Summons "Legal Documents" that act as barriers, "Project Managers" (minions) to fight, and can cast "Market Crash" to temporarily reduce player defenses.
+        Close Range attack: Summons a wall of legal documents that block player movement and attacks.
+        Long Range attack: Launches a "Market Crash" projectile that reduces player defense and attack speed.
+        Mid Range attack: Summons "Project Manager" minions that attack the player.
+
+Geology:
+    Melee/Close Range: Rock Golem - A slow, heavily armored enemy with powerful "Ground Pound" attacks that can stun players and create small tremors.
+    Ranged/Long Range: Crystal Shard Slinger - Hurls sharp "Crystal Shards" that can pierce through defenses, and can create "Geode Traps" that explode when players get too close.
+    Magic/All Range: Seismic Sorcerer - Manipulates the earth, causing "Earthquakes" that damage and knock back players, and can summon "Volcanic Pillars" from the ground.
+        Close Range attack: Causes a localized earthquake that damages and stuns nearby players.
+        Long Range attack: Summons volcanic pillars from the ground that erupt and deal fire damage.
+        Mid Range attack: Creates a field of sharp crystals that damage players who stand on them.
+
+Music:
+    Melee/Close Range: Rhythm Brute - Attacks with a "Heavy Beat," dealing damage and applying a "Discord" debuff that messes with player controls.
+    Ranged/Long Range: Melody Maestro - Shoots "Musical Notes" that home in on players, and can create "Sound Barriers" that block attacks.
+    Magic/All Range: Symphony Siren - Charms players with a "Hypnotic Melody," causing them to attack each other, and can unleash a "Sonic Boom" that damages and pushes back all nearby players.
+        Close Range attack: Releases a "Sonic Boom" that damages and pushes back nearby players.
+        Long Range attack: Casts a "Hypnotic Melody" that charms a player, causing them to attack other enemies.
+        Mid Range attack: Summons a "Sound Barrier" that blocks projectiles and damages players who touch it.
+
+Health:
+    Melee/Close Range: Infection Carrier - A fast, agile enemy that applies a "Contagion" debuff, spreading damage over time to nearby players.
+    Ranged/Long Range: Disease Vector - Shoots "Pathogen Projectiles" that can inflict various status effects like "Weakness" or "Nausea."
+    Magic/All Range: Immunity Suppressor - Creates "Aura of Sickness" that reduces player healing and defense, and can summon "Antibody Blockers" to absorb damage.
+        Close Range attack: Creates an "Aura of Sickness" that reduces player healing and defense.
+        Long Range attack: Summons "Antibody Blockers" that absorb incoming damage.
+        Mid Range attack: Launches a "Pathogen Bomb" that inflicts multiple negative status effects on players in its radius.
+
+Psychology:
+    Melee/Close Range: "Cognitive Dissonance" - A shifting enemy that deals damage based on the player's current buffs and debuffs, and can temporarily reverse player controls.
+    Ranged/Long Range: "Projectionist" - Fires "Blame" projectiles that reduce player accuracy, and can summon "Inner Critic" minions that apply a "Self-Doubt" debuff.
+    Magic/All Range: "Mind Weaver" - Manipulates player perceptions, creating "Illusions" that hide enemies or create false pathways, and can cast "Amnesia" to temporarily disable player skills.
+        Close Range attack: Creates a localized area of "Cognitive Overload" that damages and confuses nearby players.
+        Long Range attack: Launches a "Memory Wipe" projectile that temporarily disables a player's active skills.
+        Mid Range attack: Summons "Emotional Barriers" that block projectiles and absorb damage, reflecting a portion back to the player.
+    
+Engineering:
+    Melee/Close Range: Robotic Enforcer - A durable enemy with a "Wrench Slam" attack that can stun players and disable their weapons temporarily.
+    Ranged/Long Range: Drone Operator - Commands "Attack Drones" that fire lasers, and can deploy "Sentry Turrets" to cover areas.
+    Magic/All Range: Master Builder - Constructs "Force Fields" that block projectiles, "Automated Defenses" that attack players, and can unleash an "Overload Pulse" that damages and stuns all mechanical enemies.
+        Close Range attack: Deploys a "Force Field" that blocks incoming projectiles.
+        Long Range attack: Unleashes an "Overload Pulse" that damages and stuns all mechanical enemies in an area.
+        Mid Range attack: Summons "Automated Defenses" that fire at players.
+
+Art:
+    Melee/Close Range: Graffiti Golem - A colorful but tough enemy that leaves behind "Ink Splatters" on the ground, slowing players.
+    Ranged/Long Range: Brushstroke Blaster - Fires "Paintball Projectiles" that can obscure player vision and deal damage.
+    Magic/All Range: Illusionist Artist - Creates "Mirage Clones" of itself to confuse players, and can cast "Color Blindness" to make enemies invisible for a short time.
+        Close Range attack: Creates "Mirage Clones" of itself to confuse players.
+        Long Range attack: Casts "Color Blindness" on players, making enemies invisible for a short duration.
+        Mid Range attack: Fires a "Rainbow Ray" that deals elemental damage and can apply various status effects.
+
+Communication:
+    Melee/Close Range: Misinformation Agent - Attacks with a "Whisper Strike," dealing damage and applying a "Confusion" debuff that makes players attack randomly.
+    Ranged/Long Range: Echoing Orator - Projects "Sound Waves" that push players back and can temporarily deafen them.
+    Magic/All Range: Propaganda Master - Summons "Distraction Bubbles" that draw player attention away, and can cast "Silence" to prevent players from using skills.
+        Close Range attack: Summons "Distraction Bubbles" that draw player attention away.
+        Long Range attack: Casts "Silence" on players, preventing them from using skills for a short duration.
+        Mid Range attack: Projects "Sound Waves" that push players back and can temporarily deafen them.
+
+Player classes: the player will have the ability to choose between a couple of different classes with a couple of subclasses.
+
+Procrastinator: A class based on melee attacks
+    Due Date Warrior: Lower hp, higher attack speed, crit rate, and damage
+    Penalty Tanker: Tanks damage and store it, releasing it to increase damage
+
+Early Bird: A class based on ranged attacks
+    Same Day Doer: Further attacks more damage, higher critical spot damage
+    Weekend Weapon: More enemies in a certain range, higher attack speed
+
+Befriender: A class based on creating things
+    Group No Show: more creations on the field, more damage they do, but hp decay
+    The Carry: fewer creations on the field, more damage, more armor
+
+Cheater: A class based on magic
+    Support: Focused on crowd control, buffs, healing, and debuffs
+    No: boom
+
+Weapons: Players can find weapons in chests and rarely in mob and floor drops. Rarity: Common, Uncommon, Rare, Epic, Legendary, Mythic, Godlike. Weapons can get upgraded a max of two rarities with currency. Players can hold one class specific weapon and another non class specific weapon with reduced stats.
+
+Melee Weapons:
+    Pencils: Fast stabbing weapon like a rapier, high crit chance, can apply a "Graphite Bleed" damage over time effect.
+    Pens: Balanced like a sword, has a 3-hit combo, final hit causes an "Ink Splatter" that slows enemies.
+    Markers: Heavy weapon like a club, slow, wide swings, high knockback, and area damage, applies a "Mark" that increases damage taken.
+    Highlighters: A long-reach weapon like a spear, rewards spacing with bonus damage on distant hits.
+    Mechanical Pencil: A precision weapon with a "Lead Meter" for fuel. Fast attacks consume the meter, and can use a special move to expend the whole meter for a powerful burst. Lead Meter will recharge over time or can get refilled with lead found on the ground.
+
+Ranged Weapons:
+    Spit Ball(blow dart): Single shot, high damage, slow fire rate.
+    Rubber Band: Can be charged for more damage and piercing.
+    Protractor: Thrown like a boomerang, hits enemies on the way out and back.
+    Paper Airplane: A slow projectile that homes in on enemies.
+    Paper Football: Like a javelin from Call of Duty.
+
+Spell Weapons:
+    Calculator: A magic wand that shoots fast "Number" projectiles. Special ability is a powerful area of effect "Equation" spell.
+    Textbook: A magic tome with abilities based on its subject. Physics books create gravity wells, History books summon soldiers, etc.
+    Laser Pointer: A weapon that fires a continuous damage beam.
+    Compass: Creates circles that damage and push back enemies.
+    Gum: Will hypnotize enemies and make them attack other enemies for 30 seconds. After the hypnosis is up the enemy is stunned for half a second. Won't work against larger enemies.
+
+Creator weapons(Constructs spawn at level 1. Every construct will slowly lose hp over time):
+    Stapler: Creates a trap that can stun and damage enemies(Max 2 on field at a time).
+    Graph Paper: Creates zones on the floor that can buff the player or debuff enemies.
+    3D Printer: Summons a random temporary ally to fight with the player.
+    Eraser: Creates an eraser wall that stops enemies and has a small chance to erase(insta-kill) enemies when enemies attack it. Enemies can break down the wall over time.
+    Scissors: Can make mini paper turrets to fight with players.
+    Wrench: Creator class spawns with wrench in a third weapon slot. Can upgrade constructs with currency. A max level of 3.
+
+Map: 10 floors. At floor 0, players will choose a base class and one random common to epic weapon. Floors 1-4 is where players will fight enemies to collect currency and experience. Floor 5 is the Midterm exam mini bosses, you fight an easier version of all the final bosses at once. Floor 6 is a rest stop where you can buy stuff from the shop, choose a subclass and heal up. Floors 7-9 is a harder version of floors 1-4. Floor 10 is if the final boss room where you fight the final exam bosses of the classes that you choose
