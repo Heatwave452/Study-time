@@ -176,7 +176,7 @@ def show_end_screen(screen, clock, won, elapsed_time, max_combo):
         pygame.display.flip()
 
 def class_selection_screen(screen, clock, font_small, font_button):
-    all_classes = ["Math", "Computer Science", "Physics", "Chemistry"]
+    all_classes = ["Math", "Computer Science", "Physics", "Chemistry", "Biology", "History"]
     years = ["Freshman", "Sophomore", "Junior", "Senior", "Graduate"]
     selected_classes = []
     selected_year = "Freshman"
@@ -194,9 +194,9 @@ def class_selection_screen(screen, clock, font_small, font_button):
                 selecting = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for i, cls in enumerate(all_classes):
-                    x = 100 + (i % 2) * 300
-                    y = 120 + (i // 2) * 100
-                    rect = pygame.Rect(x, y, 250, 70)
+                    x = 50 + (i % 3) * 310
+                    y = 120 + (i // 3) * 85
+                    rect = pygame.Rect(x, y, 280, 65)
                     if rect.collidepoint(mouse_pos):
                         if cls in selected_classes:
                             selected_classes.remove(cls)
@@ -223,11 +223,11 @@ def class_selection_screen(screen, clock, font_small, font_button):
         screen.blit(class_label, (50, 90))
         
         for i, cls in enumerate(all_classes):
-            x = 100 + (i % 2) * 300
-            y = 120 + (i // 2) * 100
+            x = 50 + (i % 3) * 310
+            y = 120 + (i // 3) * 85
             is_selected = cls in selected_classes
             color = (100, 170, 230) if is_selected else (70, 130, 180)
-            rect = pygame.Rect(x, y, 250, 70)
+            rect = pygame.Rect(x, y, 280, 65)
             pygame.draw.rect(screen, color, rect, border_radius=6)
             text = font_small.render(cls, True, (255, 255, 255))
             screen.blit(text, (rect.centerx - text.get_width()/2, rect.centery - text.get_height()/2))

@@ -3,6 +3,8 @@ from enemy import MathSwordsman, MathArcher, ExamBoss
 from computer_science_enemies import BinaryBlade, BugSwarm
 from physics_enemies import KineticBrute, GravityManipulator
 from chemistry_enemies import AcidicAlchemist
+from biology_enemies import PoisonMite, BioEngineer
+from history_enemies import AncientWarrior, ArtilleryCommander
 from config import WIDTH, HEIGHT, ARENA, DOOR, REST_STOP, COLORS
 
 class Room:
@@ -79,6 +81,18 @@ class Room:
         elif self.class_type == "chemistry":
             enemy = AcidicAlchemist((x, y))
         
+        elif self.class_type == "biology":
+            if random.random() < 0.4:
+                enemy = BioEngineer((x, y))
+            else:
+                enemy = PoisonMite((x, y))
+        
+        elif self.class_type == "history":
+            if random.random() < 0.5:
+                enemy = ArtilleryCommander((x, y))
+            else:
+                enemy = AncientWarrior((x, y))
+        
         else:
             # Fallback for unimplemented classes
             if random.random() < 0.4:
@@ -146,6 +160,8 @@ class MapManager:
             "Computer Science": "computer science",
             "Physics": "physics",
             "Chemistry": "chemistry",
+            "Biology": "biology",
+            "History": "history",
         }
         
         # Filter to only implemented classes
