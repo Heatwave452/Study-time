@@ -13,9 +13,11 @@ You are a college student cramming for your final exams. Exhausted, you fall asl
 ## Gameplay Features
 
 ### Classes & Difficulty
-- **Select 2-4 subjects** from: Math, Computer Science, Physics, Chemistry (more coming soon!)
+- **Select 2-4 subjects** from: Math, Computer Science, Physics, Chemistry, Biology, History
 - **Choose difficulty**: Freshman → Sophomore → Junior → Senior → Graduate
 - Higher difficulties multiply enemy health and damage
+- Later floors (7-9) have 1.5x multiplier
+- Final boss has 2x multiplier
 
 ### Player Abilities
 - **Movement**: WASD keys
@@ -54,6 +56,14 @@ You are a college student cramming for your final exams. Exhausted, you fall asl
 ### Chemistry Enemies
 - **Acidic Alchemist**: Applies poison debuff on hit
 
+### Biology Enemies (NEW!)
+- **Poison Mite**: Small, fast melee that applies poison damage-over-time
+- **Bio Engineer**: Ranged support that shoots poison projectiles
+
+### History Enemies (NEW!)
+- **Ancient Warrior**: Heavily armored with shield bash stun ability
+- **Artillery Commander**: Long-range cannon fire attacks
+
 ## Controls
 
 - **WASD**: Move
@@ -78,11 +88,23 @@ python main.py
 
 ## Planned Features
 
-- 11 more enemy class types (Biology, History, Astronomy, etc.)
+- 9 more enemy class types (Astronomy, Business, Geology, Music, Health, Psychology, Engineering, Art, Communication)
 - Player class system (Procrastinator, Early Bird, Befriender, Cheater)
 - Weapon variety and rarity system
 - Enhanced debuff system (stun, slow, confusion, etc.)
 - Loot drops and equipment upgrades
+- Sound effects and music
+
+## Recent Improvements (v0.2)
+
+- Fixed critical memory leak with projectile cleanup
+- Fixed float comparison issues causing timer bugs
+- Cached fonts for better performance
+- Applied difficulty scaling properly to all enemies
+- Added Biology enemy class with poison mechanics
+- Added History enemy class with armor and cannons
+- Enhanced HUD with poison status display
+- Improved class selection UI to support 6 classes
 
 ## Development
 

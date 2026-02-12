@@ -41,7 +41,15 @@ class HUD:
             draw_text(surf, berserk_text, (WIDTH//2 - 80, 50), self.font, (255, 50, 50))
         
         # Buff indicators
+        y_offset = 188
         if player.damage_buff > 1.0:
-            draw_text(surf, f"DMG BUFF: +{int((player.damage_buff-1)*100)}%", (16, 188), self.font, (255, 150, 150))
+            draw_text(surf, f"DMG BUFF: +{int((player.damage_buff-1)*100)}%", (16, y_offset), self.font, (255, 150, 150))
+            y_offset += 24
         if player.speed_buff > 1.0:
-            draw_text(surf, f"SPD BUFF: +{int((player.speed_buff-1)*100)}%", (16, 212), self.font, (150, 255, 150))
+            draw_text(surf, f"SPD BUFF: +{int((player.speed_buff-1)*100)}%", (16, y_offset), self.font, (150, 255, 150))
+            y_offset += 24
+        
+        # Debuff indicators
+        if player.poison_timer > 0:
+            draw_text(surf, f"POISONED: {player.poison_timer:.1f}s", (16, y_offset), self.font, (100, 255, 100))
+            y_offset += 24

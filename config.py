@@ -21,6 +21,8 @@ COLORS = {
     "station": (200, 200, 100),
     "interact": (200, 200, 255),
     "proj": (255, 200, 100),
+    "poison": (100, 255, 100),
+    "history": (200, 150, 100),
 }
 
 # Player config
