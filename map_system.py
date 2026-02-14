@@ -3,14 +3,17 @@ from enemy import MathSwordsman, MathArcher, ExamBoss
 from computer_science_enemies import BinaryBlade, BugSwarm
 from physics_enemies import KineticBrute, GravityManipulator
 from chemistry_enemies import AcidicAlchemist
+from biology_enemies import PoisonMite, BioEngineer
+from history_enemies import AncientWarrior, ArtilleryCommander
 from config import WIDTH, HEIGHT, ARENA, DOOR, REST_STOP, COLORS
 
 class Room:
-    def __init__(self, id, enemies=None, room_type="hall", description="", class_type="math"):
+    def __init__(self, id, enemies=None, room_type="hall", description="", class_type="math", difficulty_mult=1.0):
         self.id = id
         self.room_type = room_type
         self.description = description
         self.class_type = class_type
+        self.difficulty_mult = difficulty_mult
         self.cleared = False
         self.enemies = []
 
@@ -33,17 +36,21 @@ class Room:
             return
 
         if self.room_type == "hall":
-            n = random.randint(2, 3)
+            n = random.randint(2, 4)  # Increased variety
             for i in range(n):
                 self._spawn_class_enemy()
         
         elif self.room_type == "classroom":
-            n = random.randint(3, 4)
+            n = random.randint(4, 6)  # More enemies for harder rooms
             for i in range(n):
                 self._spawn_class_enemy()
         
         elif self.room_type == "boss":
+            # Spawn boss with some minions
             self.enemies.append(self._spawn_boss())
+            # Add 2 minions
+            for _ in range(2):
+                self._spawn_class_enemy()
         
         elif self.room_type == "shop":
             # Rest stop has no enemies - mark as cleared immediately
@@ -55,37 +62,65 @@ class Room:
         x = random.randint(ARENA["margin"]+80, WIDTH-ARENA["margin"]-80)
         y = random.randint(ARENA["margin"]+80, HEIGHT-ARENA["margin"]-80)
         
+        enemy = None
+        
         if self.class_type == "math":
             if random.random() < 0.4:
-                self.enemies.append(MathArcher((x, y)))
+                enemy = MathArcher((x, y))
             else:
-                self.enemies.append(MathSwordsman((x, y)))
+                enemy = MathSwordsman((x, y))
         
         elif self.class_type == "computer science":
             if random.random() < 0.5:
-                self.enemies.append(BugSwarm((x, y)))
+                enemy = BugSwarm((x, y))
             else:
-                self.enemies.append(BinaryBlade((x, y)))
+                enemy = BinaryBlade((x, y))
         
         elif self.class_type == "physics":
             if random.random() < 0.4:
-                self.enemies.append(GravityManipulator((x, y)))
+                enemy = GravityManipulator((x, y))
             else:
-                self.enemies.append(KineticBrute((x, y)))
+                enemy = KineticBrute((x, y))
         
         elif self.class_type == "chemistry":
-            self.enemies.append(AcidicAlchemist((x, y)))
+            enemy = AcidicAlchemist((x, y))
+        
+        elif self.class_type == "biology":
+            if random.random() < 0.4:
+                enemy = BioEngineer((x, y))
+            else:
+                enemy = PoisonMite((x, y))
+        
+        elif self.class_type == "history":
+            if random.random() < 0.5:
+                enemy = ArtilleryCommander((x, y))
+            else:
+                enemy = AncientWarrior((x, y))
         
         else:
             # Fallback for unimplemented classes
             if random.random() < 0.4:
-                self.enemies.append(MathArcher((x, y)))
+                enemy = MathArcher((x, y))
             else:
-                self.enemies.append(MathSwordsman((x, y)))
+                enemy = MathSwordsman((x, y))
+        
+        # Apply difficulty multiplier to enemy stats
+        if enemy and self.difficulty_mult != 1.0:
+            enemy.max_hp = int(enemy.max_hp * self.difficulty_mult)
+            enemy.hp = float(enemy.max_hp)
+            enemy.base_damage = int(enemy.base_damage * self.difficulty_mult)
+        
+        self.enemies.append(enemy)
 
     def _spawn_boss(self):
-        """Spawn boss"""
-        return ExamBoss((WIDTH/2, HEIGHT/2 - 40))
+        """Spawn boss with difficulty scaling"""
+        boss = ExamBoss((WIDTH/2, HEIGHT/2 - 40))
+        # Apply difficulty multiplier to boss stats
+        if self.difficulty_mult != 1.0:
+            boss.max_hp = int(boss.max_hp * self.difficulty_mult)
+            boss.hp = float(boss.max_hp)
+            boss.base_damage = int(boss.base_damage * self.difficulty_mult)
+        return boss
 
     def check_cleared(self):
         if len(self.enemies) == 0:
@@ -129,6 +164,8 @@ class MapManager:
             "Computer Science": "computer science",
             "Physics": "physics",
             "Chemistry": "chemistry",
+            "Biology": "biology",
+            "History": "history",
         }
         
         # Filter to only implemented classes
@@ -144,7 +181,7 @@ class MapManager:
             class_key = class_map.get(class_name, "math")
             for wave in range(1, 3):
                 room_id = f"Floor {room_count + 1}: {class_name} Wave {wave}"
-                room = Room(room_id, None, "hall", f"{class_name} wave {wave}", class_key)
+                room = Room(room_id, None, "hall", f"{class_name} wave {wave}", class_key, self.difficulty_multiplier)
                 self.rooms.append(room)
                 room_count += 1
         
@@ -152,13 +189,13 @@ class MapManager:
         for class_name in self.selected_classes:
             class_key = class_map.get(class_name, "math")
             room_id = f"Floor {room_count + 1}: {class_name} Mini-Boss"
-            room = Room(room_id, None, "boss", f"{class_name} mini-boss", class_key)
+            room = Room(room_id, None, "boss", f"{class_name} mini-boss", class_key, self.difficulty_multiplier)
             self.rooms.append(room)
             room_count += 1
         
         # FLOOR 6: Rest Stop
         rest_stop_room = Room(f"Floor {room_count + 1}: Rest Stop", None, "shop", 
-                             "Midterm break - heal and upgrade")
+                             "Midterm break - heal and upgrade", "math", self.difficulty_multiplier)
         self.rooms.append(rest_stop_room)
         room_count += 1
         
@@ -167,7 +204,9 @@ class MapManager:
             class_key = class_map.get(class_name, "math")
             for wave in range(1, 3):
                 room_id = f"Floor {room_count + 1}: {class_name} Hard Wave {wave}"
-                room = Room(room_id, None, "classroom", f"Advanced {class_name} wave", class_key)
+                # Apply additional 1.5x multiplier to hard floors
+                hard_mult = self.difficulty_multiplier * 1.5
+                room = Room(room_id, None, "classroom", f"Advanced {class_name} wave", class_key, hard_mult)
                 self.rooms.append(room)
                 room_count += 1
         
@@ -175,7 +214,9 @@ class MapManager:
         final_class = self.selected_classes[0]
         class_key = class_map.get(final_class, "math")
         room_id = f"Floor {room_count + 1}: FINAL EXAM"
-        final_room = Room(room_id, None, "boss", "The ultimate test", class_key)
+        # Apply 2x multiplier to final boss
+        boss_mult = self.difficulty_multiplier * 2.0
+        final_room = Room(room_id, None, "boss", "The ultimate test", class_key, boss_mult)
         self.rooms.append(final_room)
         
         self.current_room = self.rooms[0]

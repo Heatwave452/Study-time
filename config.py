@@ -5,22 +5,31 @@ WIDTH = 1000
 HEIGHT = 700
 FPS = 60
 
-# Colors
+# Colors - Enhanced modern palette
 COLORS = {
-    "bg": (20, 20, 30),
-    "arena": (100, 100, 150),
-    "player": (100, 200, 255),
-    "attack": (200, 100, 255),
-    "enemy": (200, 100, 100),
-    "enemy_windup": (255, 150, 100),
-    "enemy_attack": (255, 100, 100),
-    "ui_hp": (100, 200, 100),
-    "ui_hp_back": (50, 50, 60),
-    "door_open": (100, 255, 100),
-    "door_closed": (200, 100, 100),
-    "station": (200, 200, 100),
-    "interact": (200, 200, 255),
-    "proj": (255, 200, 100),
+    "bg": (15, 20, 35),  # Darker, richer background
+    "bg_accent": (25, 35, 60),  # Accent background
+    "arena": (120, 140, 200),  # Brighter arena border
+    "player": (80, 180, 255),  # Vibrant cyan-blue player
+    "player_glow": (100, 220, 255),  # Glow effect
+    "attack": (255, 120, 200),  # Vibrant magenta attack
+    "enemy": (255, 80, 80),  # Bright red enemy
+    "enemy_windup": (255, 180, 100),  # Orange windup
+    "enemy_attack": (255, 100, 100),  # Red attack
+    "ui_hp": (120, 255, 120),  # Bright green HP
+    "ui_hp_back": (40, 50, 65),  # Better contrast background
+    "ui_xp": (120, 200, 255),  # Bright cyan XP
+    "ui_gold": (255, 215, 0),  # Gold accent
+    "door_open": (100, 255, 150),  # Bright green door
+    "door_closed": (255, 100, 100),  # Red closed door
+    "station": (255, 220, 100),  # Bright yellow station
+    "interact": (150, 200, 255),  # Bright blue interact
+    "proj": (255, 200, 100),  # Orange projectile
+    "poison": (150, 255, 100),  # Bright green poison
+    "history": (220, 180, 130),  # Warm history color
+    "menu_accent": (80, 120, 200),  # Menu accent blue
+    "menu_hover": (100, 150, 230),  # Menu hover effect
+    "button_shadow": (10, 15, 25),  # Button shadow
 }
 
 # Player config

@@ -3,6 +3,7 @@ import math
 import random
 from config import WIDTH, HEIGHT, ARENA, COLORS
 from utils import clamp, circle_hit
+from sprite_renderer import draw_enemy_sprite
 
 class Projectile:
     def __init__(self, pos, vel, radius, damage, ttl=3.0, orbiting=False):
@@ -99,12 +100,12 @@ class KineticBrute:
                     moved_this_frame = True
                     self.moving_timer = 0.3
             
-            if dist <= self.attack_range and self._atk_timer == 0.0:
+            if dist <= self.attack_range and self._atk_timer <= 0.0:
                 self.state = "windup"
                 self.state_timer = self.attack_windup
         
         elif self.state == "windup":
-            if self.state_timer == 0.0:
+            if self.state_timer <= 0.0:
                 if dist <= (self.attack_range + player.radius):
                     dmg = self.base_damage + int(self.absorbed_damage * 1.5)
                     player.take_damage(dmg)
@@ -114,7 +115,7 @@ class KineticBrute:
                 self._atk_timer = self.attack_cooldown
         
         elif self.state == "swing":
-            if self.state_timer == 0.0:
+            if self.state_timer <= 0.0:
                 self.state = "idle"
         
         self.moving_timer = max(0.0, self.moving_timer - dt)
@@ -195,7 +196,7 @@ class GravityManipulator:
                 self.pos += dir.normalize() * self.speed * dt
         
         # Shoot orbiting projectiles
-        if dist <= self.aggro_range and self._shoot_timer == 0.0:
+        if dist <= self.aggro_range and self._shoot_timer <= 0.0:
             if self.burst_mode:
                 # Fire 3 projectiles in burst
                 for angle_offset in [0, 2.09, 4.19]:
@@ -212,6 +213,8 @@ class GravityManipulator:
         
         for p in self.projectiles:
             p.update(dt, player.pos)
+        # remove dead projectiles to prevent memory leak
+        self.projectiles = [p for p in self.projectiles if p.alive_flag]
         
         margin = ARENA["margin"]
         self.pos.x = max(margin, min(WIDTH - margin, self.pos.x))
