@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+from sprite_renderer import draw_enemy_sprite
 from config import WIDTH, HEIGHT, ARENA, COLORS
 
 

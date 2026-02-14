@@ -3,6 +3,7 @@ import math
 import random
 from config import WIDTH, HEIGHT, ARENA, COLORS
 from utils import clamp, circle_hit
+from sprite_renderer import draw_enemy_sprite
 
 class Projectile:
     def __init__(self, pos, vel, radius, damage, ttl=3.0, orbiting=False):

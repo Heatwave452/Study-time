@@ -3,6 +3,7 @@ import math
 import random  # ADD AT TOP
 from config import WIDTH, HEIGHT, ARENA, COLORS
 from utils import clamp, circle_hit
+from sprite_renderer import draw_enemy_sprite
 
 class Projectile:
     def __init__(self, pos, vel, radius, damage, ttl=3.0):
@@ -57,8 +58,10 @@ class BinaryBlade:
         self.flash_timer = 0.0
         self.consecutive_hits = 1
         self._teleport_timer = 60.0
+        self.animation_time = 0.0
         
     def update(self, dt, player):
+        self.animation_time += dt
         self._atk_timer = max(0.0, self._atk_timer - dt)
         self.state_timer = max(0.0, self.state_timer - dt)
         self.flash_timer = max(0.0, self.flash_timer - dt)
@@ -110,9 +113,24 @@ class BinaryBlade:
         return self.hp > 0
     
     def draw(self, surf):
-        color = (200, 150, 255) if self.flash_timer > 0 else (180, 120, 255)
-        pygame.draw.circle(surf, color, (int(self.pos.x), int(self.pos.y)), self.radius)
-        pygame.draw.circle(surf, (150, 100, 200), (int(self.pos.x), int(self.pos.y)), self.radius + 6, 1)
+        # Draw sprite
+        draw_enemy_sprite(surf, self.pos, self.radius, 'cs', self.state, self.animation_time)
+        
+        # Flash effect when hit
+        if self.flash_timer > 0:
+            flash_surf = pygame.Surface((self.radius * 4, self.radius * 4), pygame.SRCALPHA)
+            alpha = int(150 * (self.flash_timer / 0.12))
+            pygame.draw.circle(flash_surf, (255, 255, 255, alpha), (self.radius * 2, self.radius * 2), self.radius * 2)
+            surf.blit(flash_surf, (int(self.pos.x) - self.radius * 2, int(self.pos.y) - self.radius * 2))
+        
+        # HP bar
+        hp_pct = self.hp / self.max_hp
+        bar_w = 40
+        bar_h = 4
+        bar_x = self.pos.x - bar_w/2
+        bar_y = self.pos.y - self.radius - 24
+        pygame.draw.rect(surf, COLORS["ui_hp_back"], (bar_x, bar_y, bar_w, bar_h))
+        pygame.draw.rect(surf, COLORS["ui_hp"], (bar_x, bar_y, bar_w * hp_pct, bar_h))
         
         hit_text = pygame.font.SysFont("arial", 12).render(str(self.consecutive_hits), True, (255, 255, 100))
         surf.blit(hit_text, (self.pos.x - 7, self.pos.y - 7))
@@ -134,8 +152,10 @@ class BugSwarm:
         self.projectiles = []
         self.flash_timer = 0.0
         self._homing_spawn_timer = 0.0
+        self.animation_time = 0.0
         
     def update(self, dt, player):
+        self.animation_time += dt
         self._shoot_timer = max(0.0, self._shoot_timer - dt)
         self.flash_timer = max(0.0, self.flash_timer - dt)
         self._homing_spawn_timer -= dt
@@ -183,8 +203,25 @@ class BugSwarm:
         return self.hp > 0
     
     def draw(self, surf):
-        color = (200, 100, 150) if self.flash_timer > 0 else (180, 80, 140)
-        pygame.draw.circle(surf, color, (int(self.pos.x), int(self.pos.y)), self.radius)
+        # Draw sprite
+        draw_enemy_sprite(surf, self.pos, self.radius, 'cs', 'idle', self.animation_time)
+        
+        # Flash effect when hit
+        if self.flash_timer > 0:
+            flash_surf = pygame.Surface((self.radius * 4, self.radius * 4), pygame.SRCALPHA)
+            alpha = int(150 * (self.flash_timer / 0.12))
+            pygame.draw.circle(flash_surf, (255, 255, 255, alpha), (self.radius * 2, self.radius * 2), self.radius * 2)
+            surf.blit(flash_surf, (int(self.pos.x) - self.radius * 2, int(self.pos.y) - self.radius * 2))
+        
+        # HP bar
+        hp_pct = self.hp / self.max_hp
+        bar_w = 40
+        bar_h = 4
+        bar_x = self.pos.x - bar_w/2
+        bar_y = self.pos.y - self.radius - 24
+        pygame.draw.rect(surf, COLORS["ui_hp_back"], (bar_x, bar_y, bar_w, bar_h))
+        pygame.draw.rect(surf, COLORS["ui_hp"], (bar_x, bar_y, bar_w * hp_pct, bar_h))
+        
         for p in self.projectiles:
             if p.alive_flag:
                 p.draw(surf)
