@@ -1,7 +1,9 @@
 import pygame
 import random
+import math
 from config import PLAYER, COLORS, ARENA, WIDTH, HEIGHT
 from utils import vec2_from_keys, clamp
+from sprite_renderer import draw_player_sprite, draw_slash_effect
 
 class Player:
     def __init__(self, pos):
@@ -83,6 +85,14 @@ class Player:
         self.area_attack_cooldown = 5.0
         self._area_attack_timer = 0.0
         
+        # Animation state
+        self.animation_time = 0.0
+        self.facing_angle = 0.0  # Direction player is facing
+        self.slash_timer = 0.0  # For attack animation
+        self.slash_angle = 0.0
+        self.last_movement = pygame.Vector2(1, 0)  # Track last movement for facing
+        self._area_attack_timer = 0.0
+        
         # Cache fonts for performance
         self.combo_font = pygame.font.SysFont("arial", 16, bold=True)
         self.level_up_timer = 0.0  # For level up animation
@@ -120,8 +130,16 @@ class Player:
         return False
 
     def update(self, dt, keys):
+        # Update animation time
+        self.animation_time += dt
+        
         # Movement with speed buff
         dir = vec2_from_keys(keys, pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d)
+        
+        # Track facing direction
+        if dir.length_squared() > 0:
+            self.last_movement = dir.normalize()
+            self.facing_angle = math.atan2(dir.y, dir.x)
         
         if self.is_dashing:
             self._dash_duration_timer -= dt
@@ -145,6 +163,10 @@ class Player:
         self._dash_timer = max(0.0, self._dash_timer - dt)
         self._parry_timer = max(0.0, self._parry_timer - dt)
         self._ultimate_timer = max(0.0, self._ultimate_timer - dt)
+        self.crit_timer = max(0.0, self.crit_timer - dt)
+        self.level_up_timer = max(0.0, self.level_up_timer - dt)
+        self._area_attack_timer = max(0.0, self._area_attack_timer - dt)
+        self.slash_timer = max(0.0, self.slash_timer - dt)
         self.crit_timer = max(0.0, self.crit_timer - dt)
         self.level_up_timer = max(0.0, self.level_up_timer - dt)
         self._area_attack_timer = max(0.0, self._area_attack_timer - dt)
@@ -184,6 +206,10 @@ class Player:
             self.combo_timer = self.combo_timeout
             self.combo_count += 1
             self.max_combo = max(self.max_combo, self.combo_count)
+            
+            # Set slash animation
+            self.slash_timer = 0.3  # Duration of slash animation
+            self.slash_angle = self.facing_angle
             
             # Check for charged attack
             if self.charged_attack_ready:
@@ -270,6 +296,16 @@ class Player:
         self.total_kills += 1
 
     def draw(self, surf):
+        # Determine state for sprite rendering
+        if self.is_dashing:
+            sprite_state = 'dashing'
+        elif self.parrying:
+            sprite_state = 'parrying'
+        elif self.attacking:
+            sprite_state = 'attacking'
+        else:
+            sprite_state = 'normal'
+        
         # NEW: Berserk glow with pulsing effect
         if self.berserk_active:
             for radius in [self.radius + 15, self.radius + 12, self.radius + 9]:
@@ -278,34 +314,20 @@ class Player:
                 pygame.draw.circle(glow_surf, (255, 50, 50, alpha), (radius + 5, radius + 5), radius)
                 surf.blit(glow_surf, (int(self.pos.x) - radius - 5, int(self.pos.y) - radius - 5))
         
-        # Draw player with glow
+        # Draw dash trail if dashing
         if self.is_dashing:
-            # Dash glow
             glow_surf = pygame.Surface((self.radius * 3, self.radius * 3), pygame.SRCALPHA)
             pygame.draw.circle(glow_surf, (100, 255, 200, 80), (self.radius * 1.5, self.radius * 1.5), self.radius + 5)
             surf.blit(glow_surf, (int(self.pos.x) - self.radius * 1.5, int(self.pos.y) - self.radius * 1.5))
-            pygame.draw.circle(surf, (100, 255, 200), (int(self.pos.x), int(self.pos.y)), self.radius)
-        elif self.parrying:
-            pygame.draw.circle(surf, (255, 200, 100), (int(self.pos.x), int(self.pos.y)), self.radius)
-        else:
-            # Normal glow
-            glow_surf = pygame.Surface((self.radius * 3, self.radius * 3), pygame.SRCALPHA)
-            pygame.draw.circle(glow_surf, (*COLORS["player_glow"], 60), (self.radius * 1.5, self.radius * 1.5), self.radius + 3)
-            surf.blit(glow_surf, (int(self.pos.x) - self.radius * 1.5, int(self.pos.y) - self.radius * 1.5))
-            pygame.draw.circle(surf, COLORS["player"], (int(self.pos.x), int(self.pos.y)), self.radius)
         
-        # Draw outer ring for depth
-        pygame.draw.circle(surf, (255, 255, 255), (int(self.pos.x), int(self.pos.y)), self.radius, 2)
+        # Draw player sprite
+        draw_player_sprite(surf, self.pos, self.radius, sprite_state, self.facing_angle, self.animation_time)
         
-        # Draw attack range with better effect
-        if self.attacking:
-            attack_surf = pygame.Surface((int(self.attack_range) * 2 + 10, int(self.attack_range) * 2 + 10), pygame.SRCALPHA)
-            pygame.draw.circle(attack_surf, (*COLORS["attack"], 100), 
-                             (int(self.attack_range) + 5, int(self.attack_range) + 5), 
-                             int(self.attack_range))
-            surf.blit(attack_surf, (int(self.pos.x) - int(self.attack_range) - 5, 
-                                   int(self.pos.y) - int(self.attack_range) - 5))
-            pygame.draw.circle(surf, COLORS["attack"], (int(self.pos.x), int(self.pos.y)), int(self.attack_range), 2)
+        # Draw slash effect when attacking
+        if self.slash_timer > 0:
+            progress = 1.0 - (self.slash_timer / 0.3)
+            slash_color = (255, 100, 100) if self.crit_timer > 0 else (255, 200, 100)
+            draw_slash_effect(surf, self.pos, self.slash_angle, self.attack_range, progress, slash_color)
         
         # Draw parry shield with glow
         if self.parrying:

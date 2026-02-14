@@ -4,6 +4,7 @@ import random
 from config import (MATH_SWORDSMAN, MATH_ARCHER, EXAM_BOSS,
                     COLORS, WIDTH, HEIGHT, ARENA)
 from utils import clamp, circle_hit, draw_triangle
+from sprite_renderer import draw_enemy_sprite, draw_projectile_trail
 
 # ---------------------------
 # Math Archer projectile
@@ -72,6 +73,9 @@ class MathSwordsman:
         self.line_len = 1
         self._line_timer = 0.0
         self._line_tick = MATH_SWORDSMAN["line_len_tick"]
+        
+        # Animation
+        self.animation_time = 0.0
 
         # attack state visuals
         self.state = "idle"  # idle, windup, swing
@@ -79,6 +83,9 @@ class MathSwordsman:
         self.flash_timer = 0.0
 
     def update(self, dt, player):
+        # Animation time
+        self.animation_time += dt
+        
         # line length growth
         self._line_timer += dt
         if self._line_timer >= self._line_tick:
@@ -135,16 +142,25 @@ class MathSwordsman:
         return self.hp > 0
 
     def draw(self, surf):
-        color = COLORS["enemy"]
-        if self.state == "windup":
-            color = COLORS["enemy_windup"]
-        elif self.state == "swing":
-            color = COLORS["enemy_attack"]
+        # Draw using sprite renderer
+        draw_enemy_sprite(surf, self.pos, self.radius, 'math', self.state, self.animation_time)
+        
+        # Flash effect when hit
         if self.flash_timer > 0:
-            color = (255, 230, 230)
-        pygame.draw.circle(surf, color, (int(self.pos.x), int(self.pos.y)), self.radius)
-        # show attack range outline subtly
-        pygame.draw.circle(surf, (120, 100, 100), (int(self.pos.x), int(self.pos.y)), int(self.attack_range), 1)
+            flash_surf = pygame.Surface((self.radius * 4, self.radius * 4), pygame.SRCALPHA)
+            alpha = int(150 * (self.flash_timer / 0.12))
+            pygame.draw.circle(flash_surf, (255, 255, 255, alpha), (self.radius * 2, self.radius * 2), self.radius * 2)
+            surf.blit(flash_surf, (int(self.pos.x) - self.radius * 2, int(self.pos.y) - self.radius * 2))
+        
+        # HP bar
+        hp_pct = self.hp / self.max_hp
+        bar_w = 40
+        bar_h = 4
+        bar_x = self.pos.x - bar_w/2
+        bar_y = self.pos.y - self.radius - 24
+        pygame.draw.rect(surf, COLORS["ui_hp_back"], (bar_x, bar_y, bar_w, bar_h))
+        pygame.draw.rect(surf, COLORS["ui_hp"], (bar_x, bar_y, bar_w * hp_pct, bar_h))
+        
         # visualize line length ticks
         x = int(self.pos.x); y = int(self.pos.y + self.radius + 8)
         for i in range(self.line_len):
@@ -175,11 +191,16 @@ class MathArcher:
         self.shield_dur = MATH_ARCHER["close_shield_duration"]
         self.shield_cooldown_total = MATH_ARCHER["close_shield_cooldown"]
         self.shield_trigger = MATH_ARCHER["close_shield_trigger"]
-
+        
         self.projectiles = []
         self.flash_timer = 0.0
+        self.state = "idle"
+        self.animation_time = 0.0
 
     def update(self, dt, player):
+        # Animation time
+        self.animation_time += dt
+        
         # timers
         self._shoot_timer = max(0.0, self._shoot_timer - dt)
         self.flash_timer = max(0.0, self.flash_timer - dt)
@@ -240,12 +261,30 @@ class MathArcher:
         return self.hp > 0
 
     def draw(self, surf):
-        color = (230, 200, 255) if not self.shield_active else (180, 255, 230)
-        pygame.draw.circle(surf, color, (int(self.pos.x), int(self.pos.y)), self.radius)
-        # draw simple bow-ish indicator
-        pygame.draw.circle(surf, (180, 180, 255), (int(self.pos.x), int(self.pos.y)), int(self.keep_distance), 1)
+        # Draw sprite
+        draw_enemy_sprite(surf, self.pos, self.radius, 'math', self.state, self.animation_time)
+        
+        # Shield active indicator
         if self.shield_active:
-            pygame.draw.circle(surf, (160, 255, 220), (int(self.pos.x), int(self.pos.y)), self.radius + 8, 2)
+            pygame.draw.circle(surf, (160, 255, 220), (int(self.pos.x), int(self.pos.y)), self.radius + 8, 3)
+        
+        # Flash effect when hit
+        if self.flash_timer > 0:
+            flash_surf = pygame.Surface((self.radius * 4, self.radius * 4), pygame.SRCALPHA)
+            alpha = int(150 * (self.flash_timer / 0.12))
+            pygame.draw.circle(flash_surf, (255, 255, 255, alpha), (self.radius * 2, self.radius * 2), self.radius * 2)
+            surf.blit(flash_surf, (int(self.pos.x) - self.radius * 2, int(self.pos.y) - self.radius * 2))
+        
+        # HP bar
+        hp_pct = self.hp / self.max_hp
+        bar_w = 40
+        bar_h = 4
+        bar_x = self.pos.x - bar_w/2
+        bar_y = self.pos.y - self.radius - 24
+        pygame.draw.rect(surf, COLORS["ui_hp_back"], (bar_x, bar_y, bar_w, bar_h))
+        pygame.draw.rect(surf, COLORS["ui_hp"], (bar_x, bar_y, bar_w * hp_pct, bar_h))
+        
+        # Draw projectiles
         for p in self.projectiles:
             if p.alive_flag:
                 p.draw(surf)
@@ -305,14 +344,15 @@ class ExamBoss(MathSwordsman):
             p.update(dt)
 
     def draw(self, surf):
-        color = (255, 60, 60)
-        if self.state == "windup":
-            color = (255, 130, 80)
-        elif self.state == "swing":
-            color = (255, 100, 100)
+        # Draw boss sprite (larger math enemy)
+        draw_enemy_sprite(surf, self.pos, self.radius, 'math', self.state, self.animation_time)
+        
+        # Flash effect when hit
         if self.flash_timer > 0:
-            color = (255, 200, 200)
-        pygame.draw.circle(surf, color, (int(self.pos.x), int(self.pos.y)), self.radius)
+            flash_surf = pygame.Surface((self.radius * 4, self.radius * 4), pygame.SRCALPHA)
+            alpha = int(150 * (self.flash_timer / 0.12))
+            pygame.draw.circle(flash_surf, (255, 255, 255, alpha), (self.radius * 2, self.radius * 2), self.radius * 2)
+            surf.blit(flash_surf, (int(self.pos.x) - self.radius * 2, int(self.pos.y) - self.radius * 2))
         
         # NEW: Phase indicator ring
         phase_color = (255, 255, 100) if self.phase == 3 else (255, 200, 100) if self.phase == 2 else (255, 150, 100)
@@ -322,10 +362,14 @@ class ExamBoss(MathSwordsman):
         phase_text = pygame.font.SysFont("arial", 14, bold=True).render(f"Phase {self.phase}", True, phase_color)
         surf.blit(phase_text, (self.pos.x - phase_text.get_width()//2, self.pos.y - 45))
         
-        # NEW: HP bar
+        # NEW: HP bar (larger for boss)
         hp_pct = self.hp / self.max_hp
-        pygame.draw.line(surf, (100, 255, 100), (self.pos.x - 35, self.pos.y - 55), 
-                        (self.pos.x - 35 + 70 * hp_pct, self.pos.y - 55), 4)
+        bar_w = 70
+        bar_h = 6
+        bar_x = self.pos.x - bar_w/2
+        bar_y = self.pos.y - self.radius - 60
+        pygame.draw.rect(surf, COLORS["ui_hp_back"], (bar_x, bar_y, bar_w, bar_h))
+        pygame.draw.rect(surf, COLORS["ui_hp"], (bar_x, bar_y, bar_w * hp_pct, bar_h))
         
         # Draw projectiles
         for p in self.projectiles:
